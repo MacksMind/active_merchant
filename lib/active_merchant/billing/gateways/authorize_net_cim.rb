@@ -301,7 +301,7 @@ module ActiveMerchant #:nodoc:
       #
       # This is what is used to charge a customer whose information you have stored in a Customer Profile.
       # 
-      # Returns a Response object that contains the result of the transaction in <tt>params['direct_response']</tt>
+      # Returns a Response object that contains the result of the transaction in <tt>params['validation_direct_response_list']</tt>
       #
       # ==== Options
       #
@@ -323,7 +323,7 @@ module ActiveMerchant #:nodoc:
 
       # Verifies an existing customer payment profile by generating a test transaction
       #
-      # Returns a Response object that contains the result of the transaction in <tt>params['direct_response']</tt>
+      # Returns a Response object that contains the result of the transaction in <tt>params['validation_direct_response_list']</tt>
       #
       # ==== Options
       #
@@ -646,25 +646,25 @@ module ActiveMerchant #:nodoc:
           :authorization => response_params['customer_profile_id'] || (response_params['profile'] ? response_params['profile']['customer_profile_id'] : nil)
         )
         
-        response.params['direct_response'] = parse_direct_response(response) if response.params['direct_response']
+        response.params['validation_direct_response_list'] = parse_direct_response(response) if response.params['validation_direct_response_list']
         response
       end
       
       def parse_direct_response(response)
-        direct_response = {'raw' => response.params['direct_response']}
-        direct_response_fields = response.params['direct_response'].split(',')
+        direct_response = {'raw' => response.params['validation_direct_response_list']}
+        direct_response_fields = response.params['validation_direct_response_list']['string'].split(',')
 
         direct_response.merge(
           {
             'response_code' => direct_response_fields[0],
             'response_subcode' => direct_response_fields[1],
             'response_reason_code' => direct_response_fields[2],
-            'message' => direct_response_fields[3],
-            'approval_code' => direct_response_fields[4],
+            'response_reason_text' => direct_response_fields[3],
+            'authorization_code' => direct_response_fields[4],
             'avs_response' => direct_response_fields[5],
             'transaction_id' => direct_response_fields[6],
             'invoice_number' => direct_response_fields[7],
-            'order_description' => direct_response_fields[8],
+            'description' => direct_response_fields[8],
             'amount' => direct_response_fields[9],
             'method' => direct_response_fields[10],
             'transaction_type' => direct_response_fields[11],
@@ -694,8 +694,12 @@ module ActiveMerchant #:nodoc:
             'tax_exempt' => direct_response_fields[35],
             'purchase_order_number' => direct_response_fields[36],
             'md5_hash' => direct_response_fields[37],
-            'card_code' => direct_response_fields[38],
-            'cardholder_authentication_verification_response' => direct_response_fields[39]
+            'card_code_response' => direct_response_fields[38],
+            'cardholder_authentication_verification_response' => direct_response_fields[39],
+            'account_number' => direct_response_fields[50],
+            'card_type' => direct_response_fields[51],
+            'split_tender_id' => direct_response_fields[52],
+            'requested' => direct_response_fields[53]
           }
         )
       end
